@@ -403,5 +403,3 @@ For issues, questions, or feature requests, please open an issue on GitHub.
 ---
 
 **Built with ❤️ by GDGC CMRIT**
-
-[![Contributors](https://contrib.rocks/image?repo=GDSC-CMRIT/Google-Cloud-Study-Jams)](https://github.com/GDSC-CMRIT/Google-Cloud-Study-Jams/graphs/contributors)
