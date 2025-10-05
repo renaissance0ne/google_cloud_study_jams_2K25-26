@@ -1,10 +1,10 @@
 'use client'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function ParticipantDetail() {
+function ParticipantDetailContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const email = searchParams.get('email')
@@ -259,6 +259,27 @@ export default function ParticipantDetail() {
         )}
       </div>
     </div>
+  )
+}
+
+// Loading component for Suspense fallback
+function ParticipantLoading() {
+  return (
+    <div className='w-full h-screen flex items-center justify-center'>
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading participant details...</p>
+      </div>
+    </div>
+  )
+}
+
+// Main component with Suspense boundary
+export default function ParticipantDetail() {
+  return (
+    <Suspense fallback={<ParticipantLoading />}>
+      <ParticipantDetailContent />
+    </Suspense>
   )
 }
 
