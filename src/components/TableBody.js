@@ -10,11 +10,15 @@ function TableBody({ Participationdata, setParticipationdata }) {
     <tbody className='text-xs'>
       {Participationdata.length > 0 ? (
         Participationdata.map((participant, index) => {
+          // Use actual rank if available, otherwise fall back to filtered index
+          const displayRank = participant._actualRank || (index + 1);
+          
           return (
             <DynamicTableRow 
               key={participant["User Email"] || participant["User Name"] || index} 
               participant={participant}
-              rowIndex={index + 1}
+              rowIndex={displayRank}
+              isFiltered={Participationdata.length !== participant._totalParticipants}
             />
           );
         })

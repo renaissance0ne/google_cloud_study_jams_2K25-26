@@ -3,7 +3,7 @@ import React from "react";
 import Link from 'next/link';
 import { getVisibleColumns } from '@/config/tableConfig';
 
-function DynamicTableRow({ participant, rowIndex }) {
+function DynamicTableRow({ participant, rowIndex, isFiltered = false }) {
   const visibleColumns = getVisibleColumns();
 
   const renderCell = (col, value) => {
@@ -11,7 +11,11 @@ function DynamicTableRow({ participant, rowIndex }) {
     if (col.isIndex) {
       const medals = ['🥇', '🥈', '🥉'];
       const medal = rowIndex <= 3 ? medals[rowIndex - 1] : '';
-      return `${rowIndex} ${medal}`;
+      
+      // Show search indicator for filtered results
+      const searchIndicator = isFiltered && participant._isSearchResult ? ' 🔍' : '';
+      
+      return `${rowIndex} ${medal}${searchIndicator}`;
     }
 
     // Handle action column (View Details button)
