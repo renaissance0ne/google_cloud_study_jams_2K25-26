@@ -1,0 +1,16 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "functions": {
+    "app/api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "GCP_PROJECT_ID": "@gcp_project_id",
+    "GCS_BUCKET_NAME": "@gcs_bucket_name", 
+    "CSV_FILE_NAME": "@csv_file_name"
+  }
+}
