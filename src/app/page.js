@@ -2,6 +2,8 @@ import Image from 'next/image'
 import Script from 'next/script';
 import Link from 'next/link'
 import TableIndex from "@/components/Table.Index";
+import ThemeToggle from "@/components/ThemeToggle";
+
 export default function Home() {
   
   return (
@@ -47,8 +49,8 @@ export default function Home() {
                 `
         }
       </Script>
-      <nav className='w-full  shadow-md relative '>
-        <div className="bg-gray-900 text-blue-500 w-full m-auto text-center p-2 flex justify-center items-center">
+      <nav className='w-full shadow-md relative bg-white dark:bg-gray-900 transition-colors duration-200'>
+        <div className="bg-gray-900 dark:bg-gray-800 text-blue-500 dark:text-blue-400 w-full m-auto text-center p-2 flex justify-center items-center transition-colors duration-200">
           <div className=""><Image src="/assets/cloudLg.png" alt="me" width="40" height="40" /></div>
           <p className=''>
             Google Cloud Study Jams 25 - 26
@@ -56,7 +58,7 @@ export default function Home() {
         </div>
 
         <div className="p-3 flex mob:flex-col m-auto max-w-6xl justify-between items-center">
-          <div className="logo mob:border-b mob:border-b-gray-200 flex justify-center items-center">
+          <div className="logo mob:border-b mob:border-b-gray-200 dark:mob:border-b-gray-700 flex justify-center items-center">
             <div className="img">
               <Image src="/assets/GDGOC-CMRIT.png" alt="Google Developer Groups On Campus CMR Institute of Technology" width="300" height="300" />
             </div>
@@ -68,12 +70,14 @@ export default function Home() {
           </div>
 
           <div className="links mob:py-3 flex justify-center items-center space-x-5">
+            {/* Theme Toggle */}
+            <ThemeToggle />
             {/* GDG Chapter Link */}
             <a 
               href="https://gdg.community.dev/gdg-on-campus-cmr-institute-of-technology-hyderabad-india" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
               title="GDG on Campus Chapter"
             >
               <Image src="/assets/GDG-LOGO.png" alt="GDG Logo" width="20" height="20" />
@@ -136,15 +140,15 @@ export default function Home() {
       </nav>
 
       {/* Update Notice */}
-      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 m-4 mx-auto max-w-6xl">
+      <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500 p-4 m-4 mx-auto max-w-6xl transition-colors duration-200">
         <div className="flex items-center">
           <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg className="h-5 w-5 text-blue-400 dark:text-blue-500" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
           </div>
           <div className="ml-3">
-            <p className="text-sm text-blue-700">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
               <strong>📊 Update Notice:</strong> Leaderboard data is refreshed every 24 hours. Your progress and ranking updates may take up to 24 hours to be reflected on the leaderboard.
             </p>
           </div>

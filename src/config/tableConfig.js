@@ -20,7 +20,7 @@ export const COLUMN_CONFIG = [
       label: '#',
       visible: true,
       mobileVisible: true,
-      className: 'Index p-3 text-center font-semibold bg-gray-100',
+      className: 'Index p-3 text-center font-semibold',
       isIndex: true, // Special flag for index column
     },
     {
@@ -49,13 +49,19 @@ export const COLUMN_CONFIG = [
       className: 'Redemption_Status p-3 relative mob:hidden',
       render: (value) => {
         const isDone = value === "Yes";
-        return `
-          <div class="w-fit m-auto rounded-full px-4 py-1 text-center ${
-            isDone ? 'bg-green-100 text-green-800 font-semibold border border-green-300' : 'bg-red-100 text-red-800 font-semibold border border-red-300'
-          }">
-            ${isDone ? 'Done' : 'Not Done'}
-          </div>
-        `;
+        if (isDone) {
+          return `
+            <div class="w-fit m-auto rounded-full px-4 py-1 text-center font-bold border-2" style="background-color: #16a34a; color: white; border-color: #15803d; box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.3);">
+              Done
+            </div>
+          `;
+        } else {
+          return `
+            <div class="w-fit m-auto rounded-full px-4 py-1 text-center font-bold border-2" style="background-color: #dc2626; color: white; border-color: #b91c1c; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3);">
+              Not Done
+            </div>
+          `;
+        }
       }
     },
     {
@@ -83,13 +89,19 @@ export const COLUMN_CONFIG = [
       className: 'Completions_both_Pathways_relative p-3 text-center mob:hidden',
       render: (value) => {
         const isComplete = value === "Yes";
-        return `
-          <div class="m-auto w-fit rounded-full px-5 py-1 text-center ${
-            isComplete ? 'bg-green-100 text-green-800 font-semibold border border-green-300' : 'bg-red-100 text-red-800 font-semibold border border-red-300'
-          }">
-            ${isComplete ? 'Yes' : 'No!'}
-          </div>
-        `;
+        if (isComplete) {
+          return `
+            <div class="m-auto w-fit rounded-full px-5 py-1 text-center font-bold border-2" style="background-color: #16a34a; color: white; border-color: #15803d; box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.3);">
+              Yes
+            </div>
+          `;
+        } else {
+          return `
+            <div class="m-auto w-fit rounded-full px-5 py-1 text-center font-bold border-2" style="background-color: #dc2626; color: white; border-color: #b91c1c; box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3);">
+              No!
+            </div>
+          `;
+        }
       }
     },
     {

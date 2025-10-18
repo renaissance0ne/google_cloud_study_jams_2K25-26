@@ -1,6 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react';
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 
 const inter = Inter({ subsets: ['latin'] });
@@ -36,15 +37,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <link rel="icon" href="/favicon.ico" />
       <head>
         
       </head>
-      <body className={inter.className}>
-        {children}
-        <Analytics />
-        
+      <body className={`${inter.className} bg-white dark:bg-gray-900 transition-colors duration-200`}>
+        <ThemeProvider>
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )
