@@ -2,7 +2,7 @@
   "name": "gdsc_cloudevent_leaderboard",
   "version": "0.1.0",
   "private": true,
-    "scripts": {
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -13,14 +13,14 @@
     "autoprefixer": "10.4.15",
     "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
+    "exceljs": "^4.4.0",
     "html2canvas": "^1.4.1",
     "next": "^15.5.4",
-    "papaparse": "^5.5.3", 
+    "papaparse": "^5.5.3",
     "postcss": "^8.5.6",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "tailwindcss": "3.3.3",
-    "xlsx": "^0.18.5"
+    "tailwindcss": "3.3.3"
   },
   "devDependencies": {
     "@types/papaparse": "^5.3.16"

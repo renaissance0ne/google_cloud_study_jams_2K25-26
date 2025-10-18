@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import DynamicTableHeader from './DynamicTableHeader'
 import TableBody from './TableBody'
 import { ELIGIBILITY_CONFIG } from '@/config/tableConfig'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
 function TableIndex() {
   const [data, setData] = useState([]);
@@ -219,164 +219,138 @@ function TableIndex() {
   };
 
   // Export function to create Excel file
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (Participationdata.length === 0) return;
 
     // Create workbook and worksheet
-    const wb = XLSX.utils.book_new();
-    
-    // Prepare data for export
-    const exportData = Participationdata.map((participant, index) => ({
-      'Rank': participant._actualRank || (index + 1),
-      'Name': participant['User Name'] || '',
-      'Email': participant['User Email'] || '',
-      'Redemption Status': participant['Access Code Redemption Status'] || '',
-      'All Completed': participant['All Skill Badges & Games Completed'] || '',
-      'Skill Badges': participant['# of Skill Badges Completed'] || 0,
-      'Arcade Games': participant['# of Arcade Games Completed'] || 0,
-      'Profile URL Status': participant['Profile URL Status'] || '',
-      'Profile URL': participant['Google Cloud Skills Boost Profile URL'] || '',
-      'Skill Badge Names': participant['Names of Completed Skill Badges'] || '',
-      'Arcade Game Names': participant['Names of Completed Arcade Games'] || ''
-    }));
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Leaderboard');
 
-    // Create worksheet from data
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    
-    // Set column widths
-    const colWidths = [
-      { wch: 8 },  // Rank
-      { wch: 25 }, // Name
-      { wch: 35 }, // Email
-      { wch: 18 }, // Redemption Status
-      { wch: 15 }, // All Completed
-      { wch: 15 }, // Skill Badges
-      { wch: 15 }, // Arcade Games
-      { wch: 20 }, // Profile URL Status
-      { wch: 60 }, // Profile URL
-      { wch: 80 }, // Skill Badge Names
-      { wch: 80 }  // Arcade Game Names
+    // Define headers
+    const headers = [
+      'Rank', 'Name', 'Email', 'Redemption Status', 'All Completed',
+      'Skill Badges', 'Arcade Games', 'Profile URL Status', 'Profile URL',
+      'Skill Badge Names', 'Arcade Game Names'
     ];
-    ws['!cols'] = colWidths;
 
-    // Add styling to header row
-    const headerStyle = {
-      font: { bold: true, color: { rgb: "FFFFFF" } },
-      fill: { fgColor: { rgb: "4472C4" } },
-      alignment: { horizontal: "center", vertical: "center" },
-      border: {
-        top: { style: "thin", color: { rgb: "000000" } },
-        bottom: { style: "thin", color: { rgb: "000000" } },
-        left: { style: "thin", color: { rgb: "000000" } },
-        right: { style: "thin", color: { rgb: "000000" } }
+    // Add headers
+    const headerRow = worksheet.addRow(headers);
+    
+    // Style headers
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4472C4' } };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+
+    // Add data rows
+    Participationdata.forEach((participant, index) => {
+      const row = worksheet.addRow([
+        participant._actualRank || (index + 1),
+        participant['User Name'] || '',
+        participant['User Email'] || '',
+        participant['Access Code Redemption Status'] || '',
+        participant['All Skill Badges & Games Completed'] || '',
+        participant['# of Skill Badges Completed'] || 0,
+        participant['# of Arcade Games Completed'] || 0,
+        participant['Profile URL Status'] || '',
+        participant['Google Cloud Skills Boost Profile URL'] || '',
+        participant['Names of Completed Skill Badges'] || '',
+        participant['Names of Completed Arcade Games'] || ''
+      ]);
+
+      // Apply conditional formatting
+      const rank = row.getCell(1).value;
+      const redemptionStatus = row.getCell(4).value;
+      const allCompleted = row.getCell(5).value;
+
+      // Rank styling (top 3)
+      if (rank <= 3) {
+        const colors = [
+          { bg: 'FFFFD700', text: 'FF8B4513' }, // Gold
+          { bg: 'FFC0C0C0', text: 'FF2F4F4F' }, // Silver
+          { bg: 'FFCD7F32', text: 'FFFFFFFF' }  // Bronze
+        ];
+        const colorIndex = rank - 1;
+        row.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: colors[colorIndex].bg } };
+        row.getCell(1).font = { color: { argb: colors[colorIndex].text }, bold: true };
+        row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
       }
-    };
 
-    // Apply header styling
-    const headers = ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1'];
-    headers.forEach(cellRef => {
-      if (ws[cellRef]) {
-        ws[cellRef].s = headerStyle;
+      // Redemption Status styling
+      if (redemptionStatus === 'Yes') {
+        row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } };
+        row.getCell(4).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+        row.getCell(4).border = {
+          top: { style: 'thick', color: { argb: 'FF15803D' } },
+          left: { style: 'thick', color: { argb: 'FF15803D' } },
+          bottom: { style: 'thick', color: { argb: 'FF15803D' } },
+          right: { style: 'thick', color: { argb: 'FF15803D' } }
+        };
+      } else if (redemptionStatus === 'No' || redemptionStatus !== 'Yes') {
+        row.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDC2626' } };
+        row.getCell(4).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+        row.getCell(4).border = {
+          top: { style: 'thick', color: { argb: 'FFB91C1C' } },
+          left: { style: 'thick', color: { argb: 'FFB91C1C' } },
+          bottom: { style: 'thick', color: { argb: 'FFB91C1C' } },
+          right: { style: 'thick', color: { argb: 'FFB91C1C' } }
+        };
+      }
+
+      // All Completed styling
+      if (allCompleted === 'Yes') {
+        row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16A34A' } };
+        row.getCell(5).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+        row.getCell(5).border = {
+          top: { style: 'thick', color: { argb: 'FF15803D' } },
+          left: { style: 'thick', color: { argb: 'FF15803D' } },
+          bottom: { style: 'thick', color: { argb: 'FF15803D' } },
+          right: { style: 'thick', color: { argb: 'FF15803D' } }
+        };
+      } else if (allCompleted === 'No' || allCompleted !== 'Yes') {
+        row.getCell(5).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDC2626' } };
+        row.getCell(5).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+        row.getCell(5).border = {
+          top: { style: 'thick', color: { argb: 'FFB91C1C' } },
+          left: { style: 'thick', color: { argb: 'FFB91C1C' } },
+          bottom: { style: 'thick', color: { argb: 'FFB91C1C' } },
+          right: { style: 'thick', color: { argb: 'FFB91C1C' } }
+        };
       }
     });
 
-    // Add conditional styling for status columns
-    const range = XLSX.utils.decode_range(ws['!ref']);
-    for (let row = 1; row <= range.e.r; row++) {
-      // Redemption Status column (D) - Bright Green for Done, Bright Red for Not Done
-      const redemptionCell = `D${row + 1}`;
-      if (ws[redemptionCell]) {
-        const value = ws[redemptionCell].v;
-        if (value === 'Yes') {
-          ws[redemptionCell].s = {
-            fill: { fgColor: { rgb: "16A34A" } }, // Bright green background
-            font: { color: { rgb: "FFFFFF" }, bold: true }, // White text
-            border: {
-              top: { style: "thick", color: { rgb: "15803D" } },
-              bottom: { style: "thick", color: { rgb: "15803D" } },
-              left: { style: "thick", color: { rgb: "15803D" } },
-              right: { style: "thick", color: { rgb: "15803D" } }
-            }
-          };
-        } else if (value === 'No' || value !== 'Yes') {
-          ws[redemptionCell].s = {
-            fill: { fgColor: { rgb: "DC2626" } }, // Bright red background
-            font: { color: { rgb: "FFFFFF" }, bold: true }, // White text
-            border: {
-              top: { style: "thick", color: { rgb: "B91C1C" } },
-              bottom: { style: "thick", color: { rgb: "B91C1C" } },
-              left: { style: "thick", color: { rgb: "B91C1C" } },
-              right: { style: "thick", color: { rgb: "B91C1C" } }
-            }
-          };
-        }
-      }
+    // Set column widths
+    const columnWidths = [8, 25, 35, 18, 15, 15, 15, 20, 60, 80, 80];
+    columnWidths.forEach((width, index) => {
+      worksheet.getColumn(index + 1).width = width;
+    });
 
-      // All Completed column (E) - Bright Green for Yes, Bright Red for No
-      const completedCell = `E${row + 1}`;
-      if (ws[completedCell]) {
-        const value = ws[completedCell].v;
-        if (value === 'Yes') {
-          ws[completedCell].s = {
-            fill: { fgColor: { rgb: "16A34A" } }, // Bright green background
-            font: { color: { rgb: "FFFFFF" }, bold: true }, // White text
-            border: {
-              top: { style: "thick", color: { rgb: "15803D" } },
-              bottom: { style: "thick", color: { rgb: "15803D" } },
-              left: { style: "thick", color: { rgb: "15803D" } },
-              right: { style: "thick", color: { rgb: "15803D" } }
-            }
-          };
-        } else if (value === 'No' || value !== 'Yes') {
-          ws[completedCell].s = {
-            fill: { fgColor: { rgb: "DC2626" } }, // Bright red background
-            font: { color: { rgb: "FFFFFF" }, bold: true }, // White text
-            border: {
-              top: { style: "thick", color: { rgb: "B91C1C" } },
-              bottom: { style: "thick", color: { rgb: "B91C1C" } },
-              left: { style: "thick", color: { rgb: "B91C1C" } },
-              right: { style: "thick", color: { rgb: "B91C1C" } }
-            }
-          };
-        }
-      }
-
-      // Rank column (A) - Gold for top 3
-      const rankCell = `A${row + 1}`;
-      if (ws[rankCell]) {
-        const rank = ws[rankCell].v;
-        if (rank <= 3) {
-          const colors = [
-            { bg: "FFD700", text: "8B4513" }, // Gold
-            { bg: "C0C0C0", text: "2F4F4F" }, // Silver
-            { bg: "CD7F32", text: "FFFFFF" }  // Bronze
-          ];
-          const colorIndex = rank - 1;
-          ws[rankCell].s = {
-            fill: { fgColor: { rgb: colors[colorIndex].bg } },
-            font: { color: { rgb: colors[colorIndex].text }, bold: true },
-            alignment: { horizontal: "center", vertical: "center" }
-          };
-        }
-      }
-    }
-
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Leaderboard');
-    
-    // Generate filename with current date and filter info
+    // Generate filename
     const now = new Date();
-    const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const dateStr = now.toISOString().split('T')[0];
     let filename = `CloudJam_Leaderboard_${dateStr}`;
     
-    // Add filter info to filename if filtered
     if (Participationdata[0]?._isSearchResult) {
       filename += '_Filtered';
     }
     filename += '.xlsx';
-    
+
     // Save file
-    XLSX.writeFile(wb, filename);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    window.URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -553,7 +527,7 @@ function TableIndex() {
                   <div className="flex flex-wrap gap-1">
                     {filters.searchTerm && (
                       <span className="px-1 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
-                        "{filters.searchTerm.length > 8 ? filters.searchTerm.substring(0, 8) + '...' : filters.searchTerm}"
+                        &quot;{filters.searchTerm.length > 8 ? filters.searchTerm.substring(0, 8) + '...' : filters.searchTerm}&quot;
                       </span>
                     )}
                     {filters.redemptionStatus !== 'all' && (

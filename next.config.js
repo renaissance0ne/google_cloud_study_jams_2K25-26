@@ -6,9 +6,7 @@ const nextConfig = {
       serverActions: {
         allowedOrigins: ['localhost:3000', '*.vercel.app'],
       },
-    },
-    // Add transpile packages for better compatibility
-    transpilePackages: ['xlsx']
+    }
   }
   
   module.exports = nextConfig
