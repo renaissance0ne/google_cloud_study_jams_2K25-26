@@ -2,17 +2,13 @@
   "name": "gdsc_cloudevent_leaderboard",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
+    "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "convert-csv": "node scripts/json-to-csv.js",
-    "swap-csv": "node scripts/swap-csv-local.js",
-    "swap-csv-gcp": "node scripts/swap-csv-gcp.js"
+    "lint": "next lint"
   },
   "dependencies": {
-    "@google-cloud/storage": "^7.17.1",
     "@vercel/analytics": "^1.0.2",
     "autoprefixer": "10.4.15",
     "eslint": "8.49.0",

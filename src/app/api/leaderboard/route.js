@@ -35,38 +35,10 @@ const readLocalCSV = async () => {
   return await fs.readFile(CSV_FILE_PATH, 'utf-8');
 };
 
-// Function to read CSV from GCP Storage (when deployed)
-const readGCPCSV = async () => {
-  const { Storage } = await import('@google-cloud/storage');
-  
-  const storage = new Storage({
-    projectId: process.env.GCP_PROJECT_ID,
-    credentials: process.env.GCP_CREDENTIALS ? JSON.parse(process.env.GCP_CREDENTIALS) : undefined
-  });
-
-  const bucketName = process.env.GCS_BUCKET_NAME || 'cloud-jam-leaderboard-data';
-  const fileName = process.env.CSV_FILE_NAME || 'data.csv';
-  
-  const bucket = storage.bucket(bucketName);
-  const file = bucket.file(fileName);
-  
-  const [fileContents] = await file.download();
-  return fileContents.toString('utf-8');
-};
-
 export async function GET() {
   try {
-    let csvString;
-    let dataSource = 'unknown';
-    
-    // Determine if we're running locally or on GCP
-    if (process.env.GCP_PROJECT_ID && process.env.GCS_BUCKET_NAME) {
-      csvString = await readGCPCSV();
-      dataSource = 'gcp';
-    } else {
-      csvString = await readLocalCSV();
-      dataSource = 'local-csv';
-    }
+    // Read from local CSV file
+    const csvString = await readLocalCSV();
     
     // Parse CSV to JSON
     const result = Papa.parse(csvString, {
@@ -96,7 +68,7 @@ export async function GET() {
       headers: headers,
       totalRecords: transformedData.length,
       lastUpdated: new Date().toISOString(),
-      source: dataSource
+      source: 'local-csv'
     });
   } catch (error) {
     console.error('❌ API Error:', error);
