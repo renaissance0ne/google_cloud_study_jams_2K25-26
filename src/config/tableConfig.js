@@ -24,25 +24,25 @@ export const COLUMN_CONFIG = [
       isIndex: true, // Special flag for index column
     },
     {
-      key: 'User Name',
+      key: 'Name',
       label: 'Name',
       visible: true,
       mobileVisible: true,
       className: 'User_Name p-3 uppercase',
       render: (value, row) => {
-        const badge = row["All Skill Badges & Games Completed"] === "Yes" ? '🏅' : '';
+        const badge = row["All Completed"] === "Yes" ? '🏅' : '';
         return `${value} ${badge}`;
       }
     },
     {
-      key: 'User Email',
+      key: 'Email',
       label: 'Email',
       visible: false, // HIDDEN - Set to true to show
       mobileVisible: false,
       className: 'User_Email p-3'
     },
     {
-      key: 'Access Code Redemption Status',
+      key: 'Redemption Status',
       label: 'Redemption Status',
       visible: true,
       mobileVisible: false,
@@ -82,7 +82,7 @@ export const COLUMN_CONFIG = [
       }
     },
     {
-      key: 'All Skill Badges & Games Completed',
+      key: 'All Completed',
       label: 'All Completed',
       visible: true,
       mobileVisible: false,
@@ -105,35 +105,35 @@ export const COLUMN_CONFIG = [
       }
     },
     {
-      key: '# of Skill Badges Completed',
+      key: 'Skill Badges',
       label: 'Number of Skill Badges Completed',
       visible: true,
       mobileVisible: false,
       className: 'no_Skill_Badges_Completed mob:hidden p-3 text-center'
     },
     {
-      key: '# of Arcade Games Completed',
+      key: 'Arcade Games',
       label: 'Number of Arcade Games Completed',
       visible: true,
       mobileVisible: false,
       className: 'no_Arcade_Games_Completed mob:hidden p-3 text-center'
     },
     {
-      key: 'Names of Completed Skill Badges',
+      key: 'Skill Badge Names',
       label: 'Completed Badges',
       visible: false, // HIDDEN - Set to true to show
       mobileVisible: false,
       className: 'Completed_Badges p-3 text-xs'
     },
     {
-      key: 'Names of Completed Arcade Games',
+      key: 'Arcade Game Names',
       label: 'Completed Games',
       visible: false, // HIDDEN - Set to true to show
       mobileVisible: false,
       className: 'Completed_Games p-3 text-xs'
     },
     {
-      key: 'Google Cloud Skills Boost Profile URL',
+      key: 'Profile URL',
       label: 'Profile URL',
       visible: false, // HIDDEN on leaderboard, shown on detail page
       mobileVisible: false,
@@ -170,6 +170,6 @@ export const COLUMN_CONFIG = [
   
 // Eligibility field configuration
 export const ELIGIBILITY_CONFIG = {
-  field: 'All Skill Badges & Games Completed',
+  field: 'All Completed',
   eligibleValue: 'Yes'
 };

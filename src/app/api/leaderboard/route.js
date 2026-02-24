@@ -35,6 +35,27 @@ const readLocalCSV = async () => {
   return await fs.readFile(CSV_FILE_PATH, 'utf-8');
 };
 
+// Custom sort function for time column
+const parseTimeValue = (timeStr) => {
+  const time = String(timeStr).trim().toUpperCase();
+  
+  // Handle November dates (e.g. "1N", "2N")
+  if (time.endsWith('N')) {
+    const day = parseInt(time.slice(0, -1), 10);
+    return { sortKey: 200 + (isNaN(day) ? 99 : day) }; // NOV days: 201–231
+  }
+  
+  // Handle October dates (plain numbers)
+  const day = parseInt(time, 10);
+  return { sortKey: isNaN(day) ? 999 : day }; // OCT days: 1–31
+};
+
+const customSort = (a, b) => {
+  const timeA = parseTimeValue(a.Time);
+  const timeB = parseTimeValue(b.Time);
+  return timeA.sortKey - timeB.sortKey;
+};
+
 export async function GET() {
   try {
     // Read from local CSV file
@@ -62,13 +83,16 @@ export async function GET() {
       });
       return transformedRow;
     });
-    
+
+    // Apply custom sorting
+    const sortedData = transformedData.sort(customSort);
+
     return NextResponse.json({
-      data: transformedData,
+      data: sortedData,
       headers: headers,
-      totalRecords: transformedData.length,
+      totalRecords: sortedData.length,
       lastUpdated: new Date().toISOString(),
-      source: 'local-csv'
+      source: 'data-csv-sorted'
     });
   } catch (error) {
     console.error('❌ API Error:', error);

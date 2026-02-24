@@ -2,7 +2,7 @@ import React from 'react'
 import DynamicTableRow from './DynamicTableRow'
 import { getVisibleColumns } from '@/config/tableConfig'
 
-function TableBody({ Participationdata, setParticipationdata }) {
+function TableBody({ Participationdata }) {
   const visibleColumns = getVisibleColumns();
   const colSpan = visibleColumns.length;
 

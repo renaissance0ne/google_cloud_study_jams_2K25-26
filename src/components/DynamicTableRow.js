@@ -20,7 +20,7 @@ function DynamicTableRow({ participant, rowIndex, isFiltered = false }) {
 
     // Handle action column (View Details button)
     if (col.isAction) {
-      const email = encodeURIComponent(participant["User Email"] || '');
+      const email = encodeURIComponent(participant["Email"] || '');
       return (
         <Link 
           href={`/participant?email=${email}`}

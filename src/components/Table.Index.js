@@ -30,8 +30,8 @@ function TableIndex() {
     if (filters.searchTerm.trim()) {
       filteredData = filteredData.filter((participant) => {
         const searchFields = [
-          participant["User Name"],
-          participant["User Email"],
+          participant["Name"],
+          participant["Email"],
           participant["Profile URL Status"]
         ].filter(Boolean);
         
@@ -44,18 +44,18 @@ function TableIndex() {
     // Apply redemption status filter
     if (filters.redemptionStatus !== 'all') {
       if (filters.redemptionStatus === 'done') {
-        filteredData = filteredData.filter(p => p["Access Code Redemption Status"] === "Yes");
+        filteredData = filteredData.filter(p => p["Redemption Status"] === "Yes");
       } else if (filters.redemptionStatus === 'not-done') {
-        filteredData = filteredData.filter(p => p["Access Code Redemption Status"] !== "Yes");
+        filteredData = filteredData.filter(p => p["Redemption Status"] !== "Yes");
       }
     }
 
     // Apply all completed filter
     if (filters.allCompleted !== 'all') {
       if (filters.allCompleted === 'yes') {
-        filteredData = filteredData.filter(p => p["All Skill Badges & Games Completed"] === "Yes");
+        filteredData = filteredData.filter(p => p["All Completed"] === "Yes");
       } else if (filters.allCompleted === 'no') {
-        filteredData = filteredData.filter(p => p["All Skill Badges & Games Completed"] !== "Yes");
+        filteredData = filteredData.filter(p => p["All Completed"] !== "Yes");
       }
     }
 
@@ -64,8 +64,8 @@ function TableIndex() {
       filteredData.sort((a, b) => {
         // Skill badge sorting takes priority
         if (filters.skillBadgeSort !== 'none') {
-          const aSkill = parseInt(a["# of Skill Badges Completed"]) || 0;
-          const bSkill = parseInt(b["# of Skill Badges Completed"]) || 0;
+          const aSkill = parseInt(a["Skill Badges"]) || 0;
+          const bSkill = parseInt(b["Skill Badges"]) || 0;
           
           if (aSkill !== bSkill) {
             return filters.skillBadgeSort === 'asc' ? aSkill - bSkill : bSkill - aSkill;
@@ -74,8 +74,8 @@ function TableIndex() {
         
         // Arcade game sorting as secondary
         if (filters.arcadeGameSort !== 'none') {
-          const aArcade = parseInt(a["# of Arcade Games Completed"]) || 0;
-          const bArcade = parseInt(b["# of Arcade Games Completed"]) || 0;
+          const aArcade = parseInt(a["Arcade Games"]) || 0;
+          const bArcade = parseInt(b["Arcade Games"]) || 0;
           
           if (aArcade !== bArcade) {
             return filters.arcadeGameSort === 'asc' ? aArcade - bArcade : bArcade - aArcade;
@@ -98,35 +98,28 @@ function TableIndex() {
                       filters.arcadeGameSort !== 'none'
     }));
   };
+  const parseTimeValue = (timeStr) => {
+    const time = String(timeStr || '').trim().toUpperCase();
+    if (time.endsWith('N')) {
+      const day = parseInt(time.slice(0, -1), 10);
+      return 200 + (isNaN(day) ? 99 : day); // NOV: 201–231
+    }
+    const day = parseInt(time, 10);
+    return isNaN(day) ? 999 : day; // OCT: 1–31
+  };
+
   const sortLeaderboard = (dataToSort) => {
     return dataToSort
       .map((participant, originalIndex) => ({
         ...participant,
-        _originalIndex: originalIndex, // Preserve original CSV position
-        _totalScore: 
-          (parseInt(participant["# of Skill Badges Completed"]) || 0) + 
-          (parseInt(participant["# of Arcade Games Completed"]) || 0)
+        _originalIndex: originalIndex,
       }))
       .sort((a, b) => {
-        // 1. Primary Sort: Redemption Status (Yes first)
-        const statusA = a["Access Code Redemption Status"] === "Yes" ? 0 : 1;
-        const statusB = b["Access Code Redemption Status"] === "Yes" ? 0 : 1;
-        
-        if (statusA !== statusB) {
-          return statusA - statusB; // Yes (0) comes before No (1)
-        }
-        
-        // 2. Secondary Sort: Total Score (Higher = Better = Top)
-        if (b._totalScore !== a._totalScore) {
-          return b._totalScore - a._totalScore; // Descending order
-        }
-        
-        // 3. Tertiary Sort: Original CSV position (Earlier row wins)
-        return a._originalIndex - b._originalIndex;
+        return parseTimeValue(a.Time) - parseTimeValue(b.Time);
       })
       .map((participant, sortedIndex) => ({
         ...participant,
-        _actualRank: sortedIndex + 1 // Add actual leaderboard position
+        _actualRank: sortedIndex + 1
       }));
   };
 
@@ -253,16 +246,16 @@ function TableIndex() {
     Participationdata.forEach((participant, index) => {
       const row = worksheet.addRow([
         participant._actualRank || (index + 1),
-        participant['User Name'] || '',
-        participant['User Email'] || '',
-        participant['Access Code Redemption Status'] || '',
-        participant['All Skill Badges & Games Completed'] || '',
-        participant['# of Skill Badges Completed'] || 0,
-        participant['# of Arcade Games Completed'] || 0,
+        participant['Name'] || '',
+        participant['Email'] || '',
+        participant['Redemption Status'] || '',
+        participant['All Completed'] || '',
+        participant['Skill Badges'] || 0,
+        participant['Arcade Games'] || 0,
         participant['Profile URL Status'] || '',
-        participant['Google Cloud Skills Boost Profile URL'] || '',
-        participant['Names of Completed Skill Badges'] || '',
-        participant['Names of Completed Arcade Games'] || ''
+        participant['Profile URL'] || '',
+        participant['Skill Badge Names'] || '',
+        participant['Arcade Game Names'] || ''
       ]);
 
       // Apply conditional formatting
@@ -691,7 +684,6 @@ function TableIndex() {
                   <DynamicTableHeader />
                   <TableBody
                     Participationdata={Participationdata}
-                    setParticipationdata={setParticipationdata}
                   />
                 </table>
               </div>
