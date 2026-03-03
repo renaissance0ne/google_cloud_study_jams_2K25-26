@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import { getCertificateByUuid } from '@/lib/google-sheets';
 
+// Always render at request time — never statically pre-render
+export const dynamic = 'force-dynamic';
+
 // 🔍 DATA FETCHING: reads the "Leaderboard" Google Sheet and matches by UUID
 async function getCertificate(uuid) {
   return getCertificateByUuid(uuid);
