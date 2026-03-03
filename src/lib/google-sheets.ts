@@ -89,19 +89,28 @@ export async function getLeaderboardRows(): Promise<Record<string, string>[]> {
 }
 
 /**
- * Look up a certificate by its unique UUID.
- * Used by: app/verify/[uuid]/page.tsx
+ * Look up a certificate by its unique UUID or UploadThing file key.
+ * Used by: app/verify/[uuid]/page.js
  *
- * Expected Google Sheet columns: UUID | Name | Time | Cert Link
+ * Matches against:
+ *   1. A dedicated "UUID" column (if it exists), OR
+ *   2. The file key embedded in the "Cert Link" column URL
+ *      e.g. https://utfs.io/f/<fileKey>  →  match on fileKey
  */
 export async function getCertificateByUuid(
   uuid: string
 ): Promise<CertificateData | null> {
   try {
     const rows = await getSheetRows();
-    const row = rows.find(
-      (r) => r['UUID']?.trim().toLowerCase() === uuid.trim().toLowerCase()
-    );
+    const token = uuid.trim().toLowerCase();
+    const row = rows.find((r) => {
+      // 1. Explicit UUID column
+      if (r['UUID']?.trim().toLowerCase() === token) return true;
+      // 2. UploadThing file key in Cert Link URL
+      const certLink = r['Cert Link']?.trim() ?? '';
+      const fileKey = certLink.split('/f/').pop()?.toLowerCase() ?? '';
+      return fileKey === token;
+    });
 
     if (!row) return null;
 
