@@ -12,6 +12,7 @@ function ParticipantDetailContent() {
   const [participant, setParticipant] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [certLink, setCertLink] = useState(null)
 
   useEffect(() => {
     if (!email) {
@@ -44,6 +45,14 @@ function ParticipantDetailContent() {
     }
 
     fetchParticipant()
+  }, [email])
+
+  useEffect(() => {
+    if (!email) return
+    fetch(`/api/certificate?email=${email}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.certLink) setCertLink(data.certLink) })
+      .catch(() => {})
   }, [email])
 
   // Format Time column into readable date
@@ -179,6 +188,23 @@ function ParticipantDetailContent() {
                     {participant['Redemption Status'] === 'Yes' ? 'Redeemed' : 'Not Redeemed'}
                   </span>
                 </div>
+
+                {certLink && (
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">Certificate</span>
+                    <a
+                      href={certLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-fit inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download Certificate
+                    </a>
+                  </div>
+                )}
 
                 <div className="flex flex-col">
                   <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">All Completed</span>
