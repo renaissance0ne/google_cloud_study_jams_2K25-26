@@ -1,8 +1,6 @@
 // src/app/api/leaderboard/route.js
 import { NextResponse } from 'next/server';
-import Papa from 'papaparse';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { getLeaderboardRows } from '@/lib/google-sheets';
 
 // Auto-detect numeric fields
 const isNumericField = (fieldName) => {
@@ -29,12 +27,6 @@ const isNumericField = (fieldName) => {
   return numericPatterns.some(pattern => pattern.test(fieldName));
 };
 
-// Function to read CSV from local file
-const readLocalCSV = async () => {
-  const CSV_FILE_PATH = path.join(process.cwd(), 'public', 'data.csv');
-  return await fs.readFile(CSV_FILE_PATH, 'utf-8');
-};
-
 // Custom sort function for time column
 const parseTimeValue = (timeStr) => {
   const time = String(timeStr).trim().toUpperCase();
@@ -58,23 +50,20 @@ const customSort = (a, b) => {
 
 export async function GET() {
   try {
-    // Read from local CSV file
-    const csvString = await readLocalCSV();
-    
-    // Parse CSV to JSON
-    const result = Papa.parse(csvString, {
-      header: true,
-      skipEmptyLines: true,
-      dynamicTyping: false,
-    });
-    
-    // Get headers from CSV
-    const headers = result.meta.fields || [];
-    
+    // Fetch rows from Google Sheets
+    const rows = await getLeaderboardRows();
+
+    if (!rows.length) {
+      return NextResponse.json({ data: [], headers: [], totalRecords: 0 });
+    }
+
+    // Derive headers from the first row's keys (preserves sheet column order)
+    const headers = Object.keys(rows[0]);
+
     // Transform data with auto-detected numeric conversion
-    const transformedData = result.data.map(row => {
+    const transformedData = rows.map(row => {
       const transformedRow = {};
-      Object.keys(row).forEach(key => {
+      headers.forEach(key => {
         if (isNumericField(key)) {
           transformedRow[key] = parseInt(row[key]) || 0;
         } else {
@@ -89,10 +78,10 @@ export async function GET() {
 
     return NextResponse.json({
       data: sortedData,
-      headers: headers,
+      headers,
       totalRecords: sortedData.length,
       lastUpdated: new Date().toISOString(),
-      source: 'data-csv-sorted'
+      source: 'google-sheets',
     });
   } catch (error) {
     console.error('❌ API Error:', error);

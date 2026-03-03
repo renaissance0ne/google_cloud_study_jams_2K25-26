@@ -81,6 +81,14 @@ function formatDate(timeVal: string): string {
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
+ * Fetch all rows from the leaderboard sheet.
+ * Used by: app/api/leaderboard/route.js
+ */
+export async function getLeaderboardRows(): Promise<Record<string, string>[]> {
+  return getSheetRows();
+}
+
+/**
  * Look up a certificate by its unique UUID.
  * Used by: app/verify/[uuid]/page.tsx
  *
